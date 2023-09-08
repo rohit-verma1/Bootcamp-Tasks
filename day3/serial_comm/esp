@@ -1,0 +1,21 @@
+#include<SoftwareSerial.h>
+SoftwareSerial mySUART(4, 5);  //D2, D1
+
+void setup()
+{
+  Serial.begin(115200);
+  mySUART.begin(115200);
+}
+
+void loop()
+{
+  if(Serial.available()>0)
+  {
+    byte x = Serial.read();
+    mySUART.write(x);
+  }
+  if(mySUART.available()>0)
+  {
+    Serial.write((char)mySUART.read());
+  }
+}
