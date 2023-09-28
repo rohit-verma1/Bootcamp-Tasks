@@ -1,0 +1,47 @@
+#include <ESP8266WiFi.h>
+#include <espnow.h>
+
+// Structure example to receive data
+typedef struct struct_message {
+    int id;
+    int x;
+    int y;
+} struct_message;
+
+// Create a struct_message called myData
+struct_message myData;
+
+// Callback function that will be executed when data is received
+void OnDataRecv(uint8_t *mac_addr, uint8_t *incomingData, uint8_t len) {
+    memcpy(&myData, incomingData, sizeof(myData));
+    Serial.println("Data received from the sender:");
+    Serial.printf("Board ID: %d\n", myData.id);
+    Serial.printf("X-coordinate: %d\n", myData.x);
+    Serial.printf("Y-coordinate: %d\n", myData.y);
+    Serial.println();
+}
+
+void setup() {
+    // Initialize Serial Monitor
+    Serial.begin(115200);
+
+    // Set device as a Wi-Fi Station
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
+
+    // Init ESP-NOW
+    if (esp_now_init() != 0) {
+        Serial.println("Error initializing ESP-NOW");
+        return;
+    }
+
+    // Set ESP-NOW role
+    esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
+
+    // Register receive callback
+    esp_now_register_recv_cb(OnDataRecv);
+}
+
+void loop() {
+    // Nothing to do here since data is received in the callback
+}
